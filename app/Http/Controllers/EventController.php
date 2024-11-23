@@ -9,7 +9,7 @@ class EventController extends Controller
 {
     public function index(){
 
-        $events = Event::all();
+        $events = Event::orderByDesc('date')->get();
         return view('admin.events.index', compact('events'));
     }
 
@@ -34,6 +34,7 @@ class EventController extends Controller
 
     public function show($id)
         {
+
             $event = Event::findOrFail($id);
             return view('admin.events.display', compact('event'));
         }

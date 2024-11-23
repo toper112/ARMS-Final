@@ -185,7 +185,7 @@
                                                         <!-- Edit Role Icon -->
                                                         <a href="{{ route('admin.users.show', $user->id) }}"
                                                             class="text-blue-500 hover:text-blue-600">
-                                                            <lord-icon src="https://cdn.lordicon.com/dicvhxpz.json"
+                                                            <lord-icon src="https://cdn.lordicon.com/exymduqj.json"
                                                                 trigger="hover" style="width:30px;height:30px">
                                                             </lord-icon>
                                                         </a>

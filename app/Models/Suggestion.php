@@ -28,13 +28,7 @@ class Suggestion extends Model
     /**
      * Specify which attributes can be mass assigned.
      */
-    protected $fillable = [
-        'user_id',
-        'event_id',
-        'context',
-        'dateSubmitted',
-    ];
-
+    protected $fillable = ['user_id', 'event_id', 'context', 'dateSubmitted'];
     /**
      * Cast attributes to native types.
      */

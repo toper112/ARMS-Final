@@ -145,7 +145,7 @@
                     {{ __('Events') }}
                 </x-nav-link>
                 @role('admin')
-                    <x-nav-link :href="route('admin.suggestions.index')" :active="request()->routeIs('admin.suggestions.index')"
+                    <x-nav-link :href="route('suggestions.index')" :active="request()->routeIs('suggestions.index')"
                         class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
                         {{ __('Suggestions') }}
                     </x-nav-link>
@@ -167,3 +167,4 @@
 </body>
 
 </html>
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
