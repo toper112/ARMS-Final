@@ -3,12 +3,14 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminPermissionController;
 use App\Http\Controllers\AdminRoleController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SuggestionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Route::get('/dashboard', function () {
@@ -21,11 +23,30 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/roles/{role}/permissions', [AdminController::class, 'givePermission'])->name('roles.permissions');
     Route::resource('permissions', AdminPermissionController::class)->names('permissions');
     Route::post('/permissions/{permission}/roles', [AdminPermissionController::class, 'assignRole'])->name('permissions.roles');
+
+
+    //users routing
     Route::resource('users', UserController::class)->names('users');
+    Route::get('/users/{user}/profile', [UserController::class, 'profile'])->name('users.profile');
     Route::post('/users/{user}/roles', [UserController::class, 'assignRole'])->name('users.roles');
     Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole'])->name('users.roles.remove');
     Route::post('/users/{user}/permissions', [UserController::class, 'givePermission'])->name('users.permissions');
     Route::delete('/users/{user}/permissions/{permission}', [UserController::class, 'revokePermission'])->name('users.permissions.revoke');
+
+    //suggestions
+    Route::get('/suggestions', [SuggestionController::class, 'index'])->name('suggestions.index');
+    Route::resource('suggestions', SuggestionController::class)->names('suggestions');
+
+    // Corrected routes for exporting and importing users
+    Route::get('/users/export', [UserController::class, 'exportUsers'])->name('users.export');
+    Route::post('/users/import', [UserController::class, 'importUsers'])->name('users.import');
+});
+
+Route::middleware(['auth', 'verified'])->group(function (){
+    //events routing
+    Route::get('/events', [EventController::class, 'index'])->name('events.index');
+    Route::resource('events', EventController::class)->names('events');
+
 });
 
 Route::middleware('auth')->group(function () {

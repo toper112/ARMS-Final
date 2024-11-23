@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('suggestions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
+            $table->string('context');
             $table->date('dateSubmitted');
             $table->timestamps();
         });

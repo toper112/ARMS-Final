@@ -9,4 +9,13 @@ class AttendanceRecord extends Model
 {
     /** @use HasFactory<\Database\Factories\AttendanceRecordFactory> */
     use HasFactory;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function events()
+    {
+        return $this->belongsTo(Event::class);
+    }
 }
