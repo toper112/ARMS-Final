@@ -185,7 +185,9 @@
                                                         <!-- Edit Role Icon -->
                                                         <a href="{{ route('admin.users.show', $user->id) }}"
                                                             class="text-blue-500 hover:text-blue-600">
-                                                            <i class="fas fa-edit"></i> <!-- FontAwesome Edit Icon -->
+                                                            <lord-icon src="https://cdn.lordicon.com/dicvhxpz.json"
+                                                                trigger="hover" style="width:30px;height:30px">
+                                                            </lord-icon>
                                                         </a>
 
                                                         <!-- Delete Icon -->
@@ -196,8 +198,9 @@
                                                             @method('DELETE')
                                                             <button type="submit"
                                                                 class="text-red-500 hover:text-red-600">
-                                                                <i class="fas fa-trash"></i>
-                                                                <!-- FontAwesome Trash Icon -->
+                                                                <lord-icon src="https://cdn.lordicon.com/hwjcdycb.json"
+                                                                    trigger="hover" style="width:30px;height:30px">
+                                                                </lord-icon>
                                                             </button>
                                                         </form>
                                                     </div>
@@ -215,3 +218,4 @@
         </div>
     </div>
 </x-admin-layout>
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
