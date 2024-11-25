@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminPermissionController;
 use App\Http\Controllers\AdminRoleController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ScannerController;
 use App\Http\Controllers\SuggestionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole'])->name('users.roles.remove');
     Route::post('/users/{user}/permissions', [UserController::class, 'givePermission'])->name('users.permissions');
     Route::delete('/users/{user}/permissions/{permission}', [UserController::class, 'revokePermission'])->name('users.permissions.revoke');
+
+    //Scanners routing
+    Route::get('/scanner', [ScannerController::class, 'index'])->name('scanner.index');
+    Route::post('/scanner/process', [ScannerController::class, 'process'])->name('scanner.process');
 
     // Corrected routes for exporting and importing users
     Route::get('/users/export', [UserController::class, 'exportUsers'])->name('users.export');

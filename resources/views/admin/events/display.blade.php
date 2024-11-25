@@ -6,10 +6,6 @@
                     <h1 class="text-2xl font-bold mb-6">Event Details</h1>
 
                     <div class="space-y-4">
-                        {{-- <div>
-                            <h2 class="text-lg font-semibold">Event ID:</h2>
-                            <p class="text-gray-600 dark:text-gray-400">{{ $event->id }}</p>
-                        </div> --}}
                         <div>
                             <h2 class="text-lg font-semibold">Event Name:</h2>
                             <p class="text-gray-600 dark:text-gray-400">{{ $event->name }}</p>

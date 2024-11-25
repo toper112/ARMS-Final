@@ -18,6 +18,10 @@
                                                 </th>
                                                 <th scope="col"
                                                     class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                                    Date
+                                                </th>
+                                                <th scope="col"
+                                                    class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                                     Actions
                                                 </th>
                                             </tr>
@@ -36,10 +40,16 @@
                                                     <td class="px-6 py-4 whitespace-nowrap">
                                                         <div
                                                             class="flex items-center text-sm text-gray-900 dark:text-gray-100">
+                                                            {{ $event->date }}
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <a href="{{ route('suggestions.show', $event->id) }}"
+                                                            class="flex items-center text-sm text-gray-900 dark:text-gray-100">
                                                             <lord-icon src="https://cdn.lordicon.com/dicvhxpz.json"
                                                                 trigger="hover" style="width:30px;height:30px">
                                                             </lord-icon>
-                                                        </div>
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             @endforeach

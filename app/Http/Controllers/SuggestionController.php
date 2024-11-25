@@ -14,7 +14,11 @@ class SuggestionController extends Controller
         $suggestions = Suggestion::paginate(10);
         return view('admin.suggestions.index', compact('suggestions', 'events'));
     }
-
+    public function show($id){
+        $event = Event::findOrFail($id);
+        $suggestions = Suggestion::where('event_id', $id)->orderByDesc('dateSubmitted')->get();
+        return view('admin.suggestions.show', compact('suggestions'));
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
