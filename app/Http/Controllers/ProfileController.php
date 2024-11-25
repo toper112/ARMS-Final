@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ProfileController extends Controller
 {
@@ -16,8 +17,14 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+
+        // Generate the QR code using the user's ID
+        $qrCode = QrCode::size(200)->generate($user->id);
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'qrCode' => $qrCode, // Pass the QR code to the view
         ]);
     }
 
