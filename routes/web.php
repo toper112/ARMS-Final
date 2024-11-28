@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminPermissionController;
 use App\Http\Controllers\AdminRoleController;
+use App\Http\Controllers\AttendanceRecordController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScannerController;
@@ -34,14 +35,23 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/users/{user}/permissions', [UserController::class, 'givePermission'])->name('users.permissions');
     Route::delete('/users/{user}/permissions/{permission}', [UserController::class, 'revokePermission'])->name('users.permissions.revoke');
 
-    //Scanners routing
-    Route::get('/scanner', [ScannerController::class, 'index'])->name('scanner.index');
-    Route::post('/scanner/process', [ScannerController::class, 'process'])->name('scanner.process');
+        //Scanners routing
+    Route::get('/scanner/{id}', [ScannerController::class, 'index'])->name('scanner.index');
+    Route::post('/scanner', [ScannerController::class, 'store'])->name('scanner.store');
 
     // Corrected routes for exporting and importing users
     Route::get('/users/export', [UserController::class, 'exportUsers'])->name('users.export');
     Route::post('/users/import', [UserController::class, 'importUsers'])->name('users.import');
 });
+
+//officer and  admin roles
+Route::middleware(['auth', 'role:admin|officer'])->prefix('admin_officer')->name('admin_officer.')->group(function () {
+        //Scanners routing
+    Route::get('/scanner/{id}', [ScannerController::class, 'index'])->name('scanner.index');
+    Route::post('/scanner', [ScannerController::class, 'store'])->name('scanner.store');
+
+});
+
 
 Route::middleware(['auth', 'verified'])->group(function (){
     //events routing
@@ -52,7 +62,9 @@ Route::middleware(['auth', 'verified'])->group(function (){
     Route::get('/suggestions', [SuggestionController::class, 'index'])->name('suggestions.index');
     Route::resource('suggestions', SuggestionController::class)->names('suggestions');
 
-
+    //attendance
+    Route::get('/attendance', [AttendanceRecordController::class, 'index'])->name('attendance.index');
+    Route::resource('attendance', AttendanceRecordController::class)->names('attendance');
 });
 
 Route::middleware('auth')->group(function () {

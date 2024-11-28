@@ -152,6 +152,10 @@
                                                 class="px-6 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                                 Actions
                                             </th>
+                                            <th scope="col"
+                                                class="px-6 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                                Attendance
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody
@@ -203,6 +207,17 @@
                                                                 </lord-icon>
                                                             </button>
                                                         </form>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="flex justify-end space-x-2">
+                                                        <!-- Attendance -->
+                                                        <a href="{{ route('admin.users.show', $user->id) }}"
+                                                            class="text-blue-500 hover:text-blue-600">
+                                                            <lord-icon src="https://cdn.lordicon.com/exymduqj.json"
+                                                                trigger="hover" style="width:30px;height:30px">
+                                                            </lord-icon>
+                                                        </a>
                                                     </div>
                                                 </td>
                                             </tr>

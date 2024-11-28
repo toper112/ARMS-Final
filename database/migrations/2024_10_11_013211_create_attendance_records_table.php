@@ -16,8 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->date('date');
-            $table->time('time_in');
-            $table->time('time_out');
+            $table->time('morning_time_in')->nullable();
+            $table->time('morning_time_out')->nullable();
+            $table->time('afternoon_time_in')->nullable();
+            $table->time('afternoon_time_out')->nullable();
             $table->timestamps();
         });
     }
