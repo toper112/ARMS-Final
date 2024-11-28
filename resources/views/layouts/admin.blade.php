@@ -150,6 +150,19 @@
                         {{ __('Suggestions') }}
                     </x-nav-link>
                 @endrole
+                @role('officer')
+                    <x-nav-link :href="route('attendance.index')" :active="request()->routeIs('attendance.index')"
+                        class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
+                        {{ __('Attendance') }}
+                    </x-nav-link>
+                @else
+                    @if (auth()->user() && !auth()->user()->roles()->exists())
+                        <x-nav-link :href="route('attendance.index')" :active="request()->routeIs('attendance.index')"
+                            class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
+                            {{ __('Attendance') }}
+                        </x-nav-link>
+                    @endif
+                @endrole
             </nav>
         </aside>
 

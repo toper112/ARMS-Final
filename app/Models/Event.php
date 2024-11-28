@@ -27,7 +27,6 @@ class Event extends Model
         'name',
         'description',
         'date',
-        'time',
-        'remarks'
+        'time'
     ];
 }

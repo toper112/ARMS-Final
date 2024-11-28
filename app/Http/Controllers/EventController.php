@@ -20,14 +20,12 @@ class EventController extends Controller
             'description' => 'required|string|max:255',
             'date' => 'required|date',
             'time' => 'required|date_format:H:i',
-            'remarks' => 'required|string|max:255',
         ]);
         Event::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
             'date' => $validated['date'],
             'time' => $validated['time'],
-            'remarks' => $validated['remarks']
         ]);
         return redirect()->route('events.index')->with('message', 'Event created successfully.');
     }

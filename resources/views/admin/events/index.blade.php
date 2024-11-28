@@ -62,14 +62,6 @@
                                 <x-input-error :messages="$errors->get('time')" class="mt-2" />
                             </div>
 
-                            <!-- Remarks -->
-                            <div>
-                                <x-input-label for="remarks" :value="__('Remarks')" />
-                                <x-text-input id="remarks" name="remarks" type="text" class="block mt-1 w-full"
-                                    required />
-                                <x-input-error :messages="$errors->get('remarks')" class="mt-2" />
-                            </div>
-
                             <!-- Modal Actions -->
                             <div class="flex justify-end space-x-2">
                                 <button type="button"
@@ -113,10 +105,12 @@
                                                 class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                                 Action
                                             </th>
-                                            <th scope="col"
-                                                class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                                Scanner
-                                            </th>
+                                            @role('admin|officer')
+                                                <th scope="col"
+                                                    class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                                    Scanner
+                                                </th>
+                                            @endrole
                                         </tr>
                                     </thead>
                                     <tbody
@@ -173,16 +167,18 @@
                                                         @endrole
                                                     </div>
                                                 </td>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="text-sm text-gray-500 dark:text-gray-300">
-                                                        <a href="{{ route('admin.scanner.index') }}"
-                                                            class="text-blue-500 hover:text-blue-700">
-                                                            <lord-icon src="https://cdn.lordicon.com/ggnoyhfp.json"
-                                                                trigger="hover" style="width:30px;height:30px">
-                                                            </lord-icon>
-                                                        </a>
-                                                    </div>
-                                                </td>
+                                                @role('admin|officer')
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <div class="text-sm text-gray-500 dark:text-gray-300">
+                                                            <a href="{{ route('admin_officer.scanner.index', $event->id) }}"
+                                                                class="text-blue-500 hover:text-blue-700">
+                                                                <lord-icon src="https://cdn.lordicon.com/ggnoyhfp.json"
+                                                                    trigger="hover" style="width:30px;height:30px">
+                                                                </lord-icon>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                @endrole
                                             </tr>
                                         @endforeach
                                     </tbody>
