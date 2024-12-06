@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttendanceRecord;
 use App\Models\Event;
 use Illuminate\Http\Request;
 
@@ -19,23 +20,40 @@ class EventController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
             'date' => 'required|date',
-            'time' => 'required|date_format:H:i',
+            'fines' => 'required|integer'
         ]);
         Event::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
             'date' => $validated['date'],
-            'time' => $validated['time'],
+            'fines' => $validated['fines']
         ]);
         return redirect()->route('events.index')->with('message', 'Event created successfully.');
     }
 
-    public function show($id)
-        {
+    // EventController.php
+public function show($id)
+{
+    $event = Event::findOrFail($id);
 
-            $event = Event::findOrFail($id);
-            return view('admin.events.display', compact('event'));
-        }
+    // Fetch attendance counts for morning and afternoon sessions
+    $morningTimeInAttendanceCount = AttendanceRecord::where('event_id', $id)
+        ->whereNotNull('morning_time_in')
+        ->count();
+    $morningTimeOutAttendanceCount = AttendanceRecord::where('event_id', $id)
+        ->whereNotNull('morning_time_out')
+        ->count();
+
+    $afternoonTimeInAttendanceCount = AttendanceRecord::where('event_id', $id)
+        ->whereNotNull('afternoon_time_in')
+        ->count();
+    $afternoonTimeOutAttendanceCount = AttendanceRecord::where('event_id', $id)
+        ->whereNotNull('afternoon_time_out')
+        ->count();
+
+    return view('admin.events.display', compact('event', 'morningTimeInAttendanceCount','morningTimeOutAttendanceCount', 'afternoonTimeInAttendanceCount','afternoonTimeOutAttendanceCount'));
+}
+
 
 
     public function update(Request $request, $id)

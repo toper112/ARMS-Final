@@ -21,61 +21,61 @@ class ScannerController extends Controller
         $validatedData = $request->validate([
             'user_id' => 'required|exists:users,id',
             'event_id' => 'required|exists:events,id',
+            'attendance_time' => 'required|string',
         ]);
 
         // Get today's date and current time
         $currentDate = now()->toDateString();
         $currentTime = Carbon::now()->toTimeString(); // Get the current time
 
-        // Check for an existing record with the same user, event, and date
+        // Extract the attendance time field name
+        $attendanceTime = $validatedData['attendance_time'];
+
+        // Map the attendance time to the correct database column
+        $attendanceColumn = null;
+        switch ($attendanceTime) {
+            case 'morning_in':
+                $attendanceColumn = 'morning_time_in';
+                break;
+            case 'morning_out':
+                $attendanceColumn = 'morning_time_out';
+                break;
+            case 'afternoon_in':
+                $attendanceColumn = 'afternoon_time_in';
+                break;
+            case 'afternoon_out':
+                $attendanceColumn = 'afternoon_time_out';
+                break;
+            default:
+                return redirect()->back()->with('message', 'Invalid attendance time.');
+        }
+
+        // Check for an existing record for the same user and event
         $attendance = AttendanceRecord::where('user_id', $validatedData['user_id'])
             ->where('event_id', $validatedData['event_id'])
             ->where('date', $currentDate)
             ->first();
 
+        // If attendance exists, update the specific time column
         if ($attendance) {
-            // If a record exists, check if the morning or afternoon time-out is already recorded
-            if ($currentTime < '12:00:00' && $attendance->morning_time_out !== null) {
-                return redirect()->back()->with('message', 'Morning time-out already recorded for this session.');
-            } else if ($currentTime < '12:00:00' && $attendance->morning_time_out === null) {
-                $attendance->update(['morning_time_out' => $currentTime]);
-                return redirect()->back()->with('message', 'Morning time-out recorded successfully!');
+            if ($attendance->$attendanceColumn !== null) {
+                return redirect()->back()->with('message', ucfirst(str_replace('_', ' ', $attendanceTime)) . ' already recorded for this session.');
+            } else {
+                $attendance->update([$attendanceColumn => $currentTime]);
+                return redirect()->back()->with('message', ucfirst(str_replace('_', ' ', $attendanceTime)) . ' recorded successfully!');
             }
-            if ($currentTime >= '12:00:00' && $attendance->afternoon_time_out !== null) {
-                return redirect()->back()->with('message', 'Afternoon time-out already recorded for this session.');
-            } else if ($currentTime >= '12:00:00' && $attendance->afternoon_time_out === null) {
-                $attendance->update(['afternoon_time_out' => $currentTime]);
-                return redirect()->back()->with('message', 'Afternoon time-out recorded successfully!');
-            }
-        }
-
-        // If no record exists, create a new one with time-in
-        if ($currentTime < '12:00:00') {
-            // Morning session
-            AttendanceRecord::create([
-                'user_id' => $validatedData['user_id'],
-                'event_id' => $validatedData['event_id'],
-                'date' => $currentDate,
-                'morning_time_in' => $currentTime,
-                'morning_time_out' => null, // Leave morning time out empty
-                'afternoon_time_in' => null,
-                'afternoon_time_out' => null,
-            ]);
-
-            return redirect()->back()->with('message', 'Morning time-in recorded successfully!');
         } else {
-            // Afternoon session
-            AttendanceRecord::create([
+            // If no attendance record exists, create a new one
+            $newRecord = [
                 'user_id' => $validatedData['user_id'],
                 'event_id' => $validatedData['event_id'],
                 'date' => $currentDate,
-                'morning_time_in' => null,
-                'morning_time_out' => null,
-                'afternoon_time_in' => $currentTime,
-                'afternoon_time_out' => null, // Leave afternoon time out empty
-            ]);
+                $attendanceColumn => $currentTime,
+            ];
 
-            return redirect()->back()->with('message', 'Afternoon time-in recorded successfully!');
+            AttendanceRecord::create($newRecord);
+            return redirect()->back()->with('message', ucfirst(str_replace('_', ' ', $attendanceTime)) . ' recorded successfully!');
         }
     }
+
 }

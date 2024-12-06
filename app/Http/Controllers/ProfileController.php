@@ -20,7 +20,7 @@ class ProfileController extends Controller
         $user = $request->user();
 
         // Generate the QR code using the user's ID
-        $qrCode = QrCode::size(200)->generate($user->id);
+        $qrCode = QrCode::size(100)->generate($user->id);
 
         return view('profile.edit', [
             'user' => $user,

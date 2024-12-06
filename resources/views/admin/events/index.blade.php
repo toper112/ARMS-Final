@@ -1,10 +1,12 @@
 <x-admin-layout>
-    <div class="py-12 w-full">
+    <div class="py-1 pb-20 w-full">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-
+                <div>
+                    <h2 class="text-4xl font-bold mb-4">Events List:</h2>
+                </div>
                 <!-- Create Event Button -->
-                @role('admin|officer')
+                @role('admin')
                     <div class="mb-4 flex justify-end">
                         <button
                             class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 transition duration-150 ease-in-out"
@@ -53,13 +55,11 @@
                                     required />
                                 <x-input-error :messages="$errors->get('date')" class="mt-2" />
                             </div>
-
-                            <!-- Time -->
                             <div>
-                                <x-input-label for="time" :value="__('Time')" />
-                                <x-text-input id="time" name="time" type="time" class="block mt-1 w-full"
-                                    required />
-                                <x-input-error :messages="$errors->get('time')" class="mt-2" />
+                                <x-input-label for="fines" :value="__('Fines')" />
+                                <x-text-input id="fines" name="fines" type="number" class="block mt-1 w-full"
+                                    required autofocus />
+                                <x-input-error :messages="$errors->get('fines')" class="mt-2" />
                             </div>
 
                             <!-- Modal Actions -->
@@ -83,7 +83,7 @@
                             <div
                                 class="shadow overflow-hidden border-b border-gray-200 dark:border-gray-700 sm:rounded-lg">
                                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead class="bg-gray-100 dark:bg-gray-700">
+                                    <thead class="bg-green-100 dark:bg-gray-700">
                                         <tr>
                                             <th scope="col"
                                                 class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -99,7 +99,7 @@
                                             </th>
                                             <th scope="col"
                                                 class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                                Time
+                                                Fines
                                             </th>
                                             <th scope="col"
                                                 class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -136,7 +136,7 @@
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div class="text-sm text-gray-500 dark:text-gray-300">
-                                                        {{ $event->time }}
+                                                        ₱ {{ $event->fines }}
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">

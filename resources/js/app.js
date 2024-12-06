@@ -8,3 +8,5 @@ window.Alpine = Alpine;
 
 Alpine.start();
 
+import $ from 'jquery';  // Import jQuery
+window.$ = window.jQuery = $;  // Set jQuery globally
