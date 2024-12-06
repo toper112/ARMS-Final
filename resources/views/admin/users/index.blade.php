@@ -9,10 +9,11 @@
                 <div class="flex justify-between mb-6">
                     <!-- Left Side: Export and Import buttons -->
                     <div class="flex space-x-4">
+
                         <!-- Export Button -->
                         <a href="{{ route('admin.users.export') }}"
                             class="px-4 py-2 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 transition duration-150">
-                            Export Users
+                            Export
                         </a>
 
                         <!-- Import Button with Drag-and-Drop -->
@@ -73,6 +74,23 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        <div class="mb-4 flex justify-between items-center">
+                            <form method="GET" action="{{ route('admin.users.index') }}"
+                                class="flex items-center space-x-2">
+                                <div>
+                                    <select name="role"
+                                        class="px-8 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+                                        onchange="this.form.submit()">
+                                        <option value="">All Roles</option>
+                                        <option value="officer" {{ request('role') === 'officer' ? 'selected' : '' }}>
+                                            Officers</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+
+
                     </form>
                 </div>
 
@@ -126,7 +144,7 @@
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div
                                                         class="flex items-center text-sm text-gray-900 dark:text-gray-100">
-                                                        {{ $user->first_name . ' ' . $user->last_name }}
+                                                        {{ $user->last_name . ', ' . $user->first_name }}
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">

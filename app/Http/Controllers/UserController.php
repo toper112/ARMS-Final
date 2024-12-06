@@ -8,53 +8,62 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\Response;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
         // Initialize the query, excluding users where 'first_name' is 'admin'
-        $users = User::query()->whereNot('first_name', 'admin');
+    $users = User::query()->whereNot('first_name', 'admin')->orderBy('last_name');
 
-        // Apply search filter
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $users->where(function($query) use ($search) {
-                $query->where('first_name', 'like', "%$search%")
-                    ->orWhere('last_name', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%$search%");
-            });
-        }
+    // Filter by role "officer"
+    if ($request->has('role') && $request->role === 'officer') {
+        $users->role('officer');
+    }
 
-        // Apply year filter
-        if ($request->has('year') && $request->year != '') {
-            $users->where('year', $request->year);
-        }
+    // Apply search filter
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+        $users->where(function($query) use ($search) {
+            $query->where('first_name', 'like', "%$search%")
+                ->orWhere('last_name', 'like', "%$search%")
+                ->orWhere('email', 'like', "%$search%");
+        });
+    }
 
-        // Apply section filter
-        if ($request->filled('section')) {
-            $users->where('section', 'like', "%{$request->section}%");
-        }
+    // Apply year filter
+    if ($request->has('year') && $request->year != '') {
+        $users->where('year', $request->year);
+    }
 
-        // Exclude specific year and section combination
-        $users = $users->where(function ($query) {
-            $query->where('year', '!=', 1) // Exclude year 1
-                ->orWhere('section', '!=', 'admin'); // Exclude section admin
-        })->paginate(10);
+    // Apply section filter
+    if ($request->filled('section')) {
+        $users->where('section', 'like', "%{$request->section}%");
+    }
 
+    // Exclude specific year and section combination
+    $users = $users->where(function ($query) {
+        $query->where('year', '!=', 1) // Exclude year 1
+            ->orWhere('section', '!=', 'admin'); // Exclude section admin
+    })->paginate(10);
 
-        // Get the filtered results
-        // $users = $users->paginate(10);
+    // Define possible years (assuming 1 to 4 are the valid years)
+    $years = User::distinct()
+        ->orderBy('year')
+        ->whereNot('year', '1')
+        ->pluck('year')
+        ->toArray();
 
-        // Define possible years (assuming 1 to 4 are the valid years)
-        $years = User::distinct()->pluck('year')->toArray();
+    // Retrieve distinct sections from the users table
+    $sections = User::distinct()
+        ->orderBy('section')
+        ->whereNot('section', 'admin')
+        ->pluck('section')
+        ->toArray();
 
-        // Retrieve distinct sections from the users table
-        $sections = User::distinct()->pluck('section')->toArray();
-
-        // Return the view with filtered users, years, and sections data
-        return view('admin.users.index', compact('users', 'years', 'sections'));
+    // Return the view with filtered users, years, and sections data
+    return view('admin.users.index', compact('users', 'years', 'sections'));
     }
 
 
@@ -163,34 +172,20 @@ class UserController extends Controller
     }
 
      // Method for exporting users to CSV
-     public function exportUsers()
-     {
-         $headers = [
-             'Content-Type' => 'text/csv',
-             'Content-Disposition' => 'attachment; filename="users.csv"',
-         ];
+    public function export()
+    {
+        // Fetch users with only the necessary attributes
+        $users = User::select('first_name', 'last_name', 'LRN', 'year', 'section', 'email')->get();
 
-         $callback = function () {
-             $handle = fopen('php://output', 'w');
-             fputcsv($handle, ['First Name', 'Last Name', 'LRN', 'Year', 'Section', 'Email']);
+        // Initialize the CSV exporter
+        $csvExporter = new \Laracsv\Export();
 
-             $users = User::all(['first_name', 'last_name', 'LRN', 'year', 'section', 'email']);
-             foreach ($users as $user) {
-                 fputcsv($handle, [
-                     $user->first_name,
-                     $user->last_name,
-                     $user->LRN,
-                     $user->year,
-                     $user->section,
-                     $user->email,
-                 ]);
-             }
+        // Build and download the CSV file
+        $csvExporter->build($users, ['first_name', 'last_name', 'LRN', 'year', 'section', 'email'])
+                    ->download('users.csv');
+    }
 
-             fclose($handle);
-         };
 
-         return new StreamedResponse($callback, 200, $headers);
-     }
 
      // Method for importing users from CSV
      public function import(Request $request)
@@ -275,6 +270,37 @@ class UserController extends Controller
         ->with('message', $message)
         ->with('errors', $errors);
 }
+
+//
+
+
+    // public function resetPassword(User $user)
+    // {
+    //     try {
+    //         // Reset the password to the default value
+    //         $user->update([
+    //             'password' => Hash::make('ilovesalus2025'),
+    //         ]);
+
+    //         return back()->with('message', "Password reset successfully for {$user->first_name} {$user->last_name}.");
+    //     } catch (\Exception $e) {
+    //         return back()->with('error', 'Failed to reset the password. Please try again.');
+    //     }
+    // }
+
+   public function resetPassword(Request $request, User $user)
+    {
+        if ($user->hasRole('admin')) {
+            return back()->with('message', 'Cannot reset password for admin.');
+        }
+
+        $user->update([
+            'password' => Hash::make('ilovesalus2025'), // Default password
+        ]);
+
+        return back()->with('message', 'Password reset to default successfully.');
+    }
+
 
 
 }

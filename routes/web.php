@@ -40,8 +40,28 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/scanner', [ScannerController::class, 'store'])->name('scanner.store');
 
     // Corrected routes for exporting and importing users
-    Route::get('/users/export', [UserController::class, 'exportUsers'])->name('users.export');
+    // Route::get('/users/export', [UserController::class, 'export'])->name('users.export');
     Route::post('/users/import', [UserController::class, 'import'])->name('users.import');
+    Route::get('/admin/users/export', [UserController::class, 'export'])->name('users.export');
+
+    // Route to update the remarks
+    Route::patch('/events/{id}/update-remarks', [EventController::class, 'updateRemarks'])->name('events.updateRemarks');
+
+
+    //resetpassword
+    // Route::patch('admin/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+    Route::patch('admin/users/{user}/reset-password', [UserController::class, 'resetPassword'])
+    ->name('users.reset-password');
+
+
+
+
+
+
+
+
+
+
 
     //attendance para sa admin
     Route::get('/attendance', [AttendanceRecordController::class, 'index'])->name('attendance.index');
@@ -54,6 +74,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Route::resource('suggestions', SuggestionController::class)->names('suggestions');
 
 });
+
+// Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+//     // Other admin routes...
+//     Route::get('/users/export', [UserController::class, 'export'])->name('users.export');
+// });
+
 
 //officer and  admin roles
 Route::middleware(['auth', 'role:admin|officer'])->prefix('admin_officer')->name('admin_officer.')->group(function () {
