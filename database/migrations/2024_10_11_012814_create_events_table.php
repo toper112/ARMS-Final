@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('description');
             $table->date('date');
             $table->integer('fines');
+            $table->varchar('remarks',15);
             $table->timestamps();
         });
     }

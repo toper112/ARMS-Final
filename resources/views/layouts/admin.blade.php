@@ -132,6 +132,10 @@
                         class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
                         {{ __('Users') }}
                     </x-nav-link>
+                    {{-- <x-nav-link :href="route('admin.users.export')" :active="request()->routeIs('admin.users.export')"
+                        class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
+                        {{ __('export users') }}
+                    </x-nav-link> --}}
                 @endrole
                 <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.index')"
                     class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">

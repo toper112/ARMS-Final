@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AttendanceRecord;
 use App\Models\Event;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -21,38 +22,70 @@ class EventController extends Controller
             'description' => 'required|string|max:255',
             'date' => 'required|date',
             'fines' => 'required|integer'
+
         ]);
         Event::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
             'date' => $validated['date'],
-            'fines' => $validated['fines']
+            'fines' => $validated['fines'],
+            'remarks' => 'disable' //Default value
+
         ]);
         return redirect()->route('events.index')->with('message', 'Event created successfully.');
     }
 
     // EventController.php
-public function show($id)
+public function show($id, Request $request)
 {
+    // Start the user query, excluding 'admin'
+    $query = User::where('first_name', '!=', 'admin');
+    $years = User::distinct()->whereNot('year', '1')->orderBy('year')->pluck('year');
+
+    // Check if 'year' filter is present in the request and apply it
+    if ($request->has('year') && $request->year != '') {
+        $query->where('year', $request->year);
+    }
+
+    // Get the total number of users after applying filters
+    $totalUsers = $query->count();
+
+    // Retrieve the event by its ID
     $event = Event::findOrFail($id);
 
+    // Filter attendance records based on the selected year
+    $attendanceQuery = AttendanceRecord::where('event_id', $id);
+
+    if ($request->has('year') && $request->year != '') {
+        $attendanceQuery->whereHas('user', function ($query) use ($request) {
+            $query->where('year', $request->year);
+        });
+    }
+
     // Fetch attendance counts for morning and afternoon sessions
-    $morningTimeInAttendanceCount = AttendanceRecord::where('event_id', $id)
+    $morningTimeInAttendanceCount = (clone $attendanceQuery)
         ->whereNotNull('morning_time_in')
         ->count();
-    $morningTimeOutAttendanceCount = AttendanceRecord::where('event_id', $id)
+    $morningTimeOutAttendanceCount = (clone $attendanceQuery)
         ->whereNotNull('morning_time_out')
         ->count();
-
-    $afternoonTimeInAttendanceCount = AttendanceRecord::where('event_id', $id)
+    $afternoonTimeInAttendanceCount = (clone $attendanceQuery)
         ->whereNotNull('afternoon_time_in')
         ->count();
-    $afternoonTimeOutAttendanceCount = AttendanceRecord::where('event_id', $id)
+    $afternoonTimeOutAttendanceCount = (clone $attendanceQuery)
         ->whereNotNull('afternoon_time_out')
         ->count();
 
-    return view('admin.events.display', compact('event', 'morningTimeInAttendanceCount','morningTimeOutAttendanceCount', 'afternoonTimeInAttendanceCount','afternoonTimeOutAttendanceCount'));
+    // Return the view with the data
+    return view('admin.events.display', compact(
+        'event', 'totalUsers',
+        'morningTimeInAttendanceCount', 'morningTimeOutAttendanceCount',
+        'afternoonTimeInAttendanceCount', 'afternoonTimeOutAttendanceCount',
+        'years'
+    ));
 }
+
+
 
 
 
@@ -62,6 +95,31 @@ public function show($id)
         $event->update($request->all());
         return redirect()->route('events.index')->with( 'message', 'Event updated successfully.');
     }
+
+    public function updateRemarks(Request $request, $id)
+    {
+
+        // Validate the request data (if necessary)
+        $request->validate([
+            'remarks' => 'required|string|in:enable,disable', // Example: remarks can only be 'enable' or 'disable'
+        ]);
+
+        // Find the event or fail if not found
+        $event = Event::findOrFail($id);
+
+        // Update the remarks
+        $event->update($request->only('remarks'));
+
+        // Set a dynamic success message
+        $message = $event->remarks == 'enable'
+            ? 'Event enabled scanning successfully.'
+            : 'Event disabled scanning successfully.';
+
+        // Redirect with the success message
+        return back()->with('message', $message);
+
+    }
+
     public function destroy($id)
     {
         $event = Event::findOrFail($id);

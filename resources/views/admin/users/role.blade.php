@@ -95,6 +95,27 @@
                     </form>
                 </div>
 
+                <!-- Reset Password Section -->
+                <!-- Reset Password Section -->
+                <div class="mt-6 p-4 bg-slate-100">
+                    <h2 class="text-2xl font-semibold text-gray-500">Reset Password</h2>
+                    <div class="flex space-x-2 mt-4 p-2">
+                        <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit"
+                                class="px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md">
+                                Reset Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+
+
+
+
+
                 <!-- Roles Section -->
                 <div class="mt-6 p-4 bg-slate-100">
                     <h2 class="text-2xl font-semibold text-gray-500">Roles</h2>

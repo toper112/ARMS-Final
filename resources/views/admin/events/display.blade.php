@@ -53,42 +53,27 @@
 
                         <!-- Attendance Overview Section (Right side) -->
                         @role('admin|officer')
-                            <div class="w-1/2 space-y-6 flex flex-col justify-between border-t lg:border-t-0">
-                                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Attendance Overview:</h2>
-                                <div class="space-y-6 mt-2">
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Morning Time-In:
-                                        </h3>
-                                        <p class="text-gray-600 dark:text-gray-300">
-                                            <span class="font-medium">{{ $morningTimeInAttendanceCount }} students</span>
-                                        </p>
-                                    </div>
-
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Morning Time-Out:
-                                        </h3>
-                                        <p class="text-gray-600 dark:text-gray-300">
-                                            <span class="font-medium">{{ $morningTimeOutAttendanceCount }} students</span>
-                                        </p>
-                                    </div>
-
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Afternoon
-                                            Time-In:
-                                        </h3>
-                                        <p class="text-gray-600 dark:text-gray-300">
-                                            <span class="font-medium">{{ $afternoonTimeInAttendanceCount }} students</span>
-                                        </p>
-                                    </div>
-
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Afternoon
-                                            Time-Out:</h3>
-                                        <p class="text-gray-600 dark:text-gray-300">
-                                            <span class="font-medium">{{ $afternoonTimeOutAttendanceCount }} students</span>
-                                        </p>
-                                    </div>
+                            <div class="w-full flex flex-col">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                                        Attendance Overview:
+                                    </h2>
+                                    <form method="GET" action="{{ route('events.show', $event->id) }}"
+                                        class="flex items-center">
+                                        <select name="year"
+                                            class="py-2 border rounded-lg focus:outline-none focus:ring focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+                                            onchange="this.form.submit()">
+                                            <option value="">Year</option>
+                                            @foreach ($years as $year)
+                                                <option value="{{ $year }}"
+                                                    {{ request('year') == $year ? 'selected' : '' }}>
+                                                    {{ $year }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </form>
                                 </div>
+                                <canvas id="attendanceChart" class="h-64"></canvas>
                             </div>
                         @endrole
                     </div>
@@ -234,5 +219,58 @@
                 feedbackModal.classList.add('hidden');
             });
         }
+
+        //about the chart
+        const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+        // Data from the controller
+        const attendanceData = {
+            labels: ['Morning Time-In', 'Morning Time-Out', 'Afternoon Time-In', 'Afternoon Time-Out'],
+            datasets: [{
+                label: 'Attendance Count',
+                data: [
+                    {{ $morningTimeInAttendanceCount }},
+                    {{ $morningTimeOutAttendanceCount }},
+                    {{ $afternoonTimeInAttendanceCount }},
+                    {{ $afternoonTimeOutAttendanceCount }}
+                ],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(54, 162, 235, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        // Chart Configuration
+        const config = {
+            type: 'bar', // You can also use 'line', 'pie', 'doughnut', etc.
+            data: attendanceData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: {{ $totalUsers }}
+                    }
+                }
+            }
+        };
+
+        // Render the chart
+        new Chart(ctx, config);
     });
 </script>
