@@ -16,12 +16,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.lordicon.com/lordicon.js"></script>
 
     <!-- Tailwind CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-white font-sans">
+<body class="bg-white font-sans h-screen overflow-hidden">
     <!-- Session Message -->
     @if (Session::has('message'))
         <div class="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 bg-green-200 text-green-900"
@@ -97,10 +99,21 @@
         </x-dropdown>
     </header>
 
-    <!-- Content Wrapper -->
-    <div class="flex">
+    <div x-data="{ open: false }" class="flex h-screen">
+        <!-- Sidebar (Mobile) -->
+        <div x-show="open" class="fixed inset-0 z-40 bg-gray-700 bg-opacity-50 sm:hidden"
+            x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        </div>
+
         <!-- Sidebar -->
-        <aside class="w-80 h-screen bg-green-200 text-gray-900 flex-shrink-0 p-4">
+        <aside
+            class="bg-green-200 text-gray-900 p-4 fixed z-50 h-full w-64 transform -translate-x-full sm:translate-x-0 sm:relative sm:w-80 sm:block"
+            :class="{ 'translate-x-0': open, '-translate-x-full': !open }"
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="-translate-x-full"
+            x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-300"
+            x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full">
             <!-- Logo -->
             <div class="shrink-0 flex items-center justify-center mb-6">
                 <a href="{{ route('dashboard') }}">
@@ -110,42 +123,22 @@
 
             <!-- Navigation Links -->
             <nav class="flex flex-col space-y-4 items-center">
-                <!-- Dashboard Link -->
                 <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
                     class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
                     {{ __('Dashboard') }}
                 </x-nav-link>
-                {{-- @role('admin')
-                <x-nav-link :href="route('admin.index')" :active="request()->routeIs('admin.index')"
-                            class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
-                    {{ __('Admin') }}
-                </x-nav-link>
-                @endrole
-                @role('admin')
-                <x-nav-link :href="route('admin.permissions.index')" :active="request()->routeIs('admin.permissions.index')"
-                            class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
-                    {{ __('Permissions') }}
-                </x-nav-link>
-                @endrole
-                @role('admin')
-                <x-nav-link :href="route('admin.roles.index')" :active="request()->routeIs('admin.roles.index')"
-                            class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
-                    {{ __('Roles') }}
-                </x-nav-link>
-                @endrole --}}
                 @role('admin')
                     <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.index')"
                         class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
                         {{ __('Users') }}
                     </x-nav-link>
                 @endrole
-
                 <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.index')"
                     class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
                     {{ __('Events') }}
                 </x-nav-link>
                 @role('admin')
-                    <x-nav-link :href="route('suggestions.index')" :active="request()->routeIs('suggestions.index')"
+                    <x-nav-link :href="route('admin.suggestions.index')" :active="request()->routeIs('admin.suggestions.index')"
                         class="text-xl flex justify-center items-center text-white bg-green-500 hover:bg-green-700 px-10 py-2 border-1 border-gray-600 rounded-lg w-3/4">
                         {{ __('Suggestions') }}
                     </x-nav-link>
@@ -166,18 +159,20 @@
             </nav>
         </aside>
 
+        <!-- Mobile Sidebar Toggle -->
+        <button @click="open = !open" class="sm:hidden absolute top-24 left-6 text-gray-800">
+            <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
 
 
-
-        <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col p-6 bg-gray-50">
-            <!-- Page Content -->
-            <main class="flex-1">
-                {{ $slot }}
-            </main>
-        </div>
+        <!-- Main Content -->
+        <main class="flex-1 overflow-auto p-4">
+            {{ $slot }}
+        </main>
     </div>
-</body>
+
 
 </html>
-<script src="https://cdn.lordicon.com/lordicon.js"></script>

@@ -15,9 +15,9 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [AdminController::class, 'dashboard'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('index');
@@ -35,13 +35,24 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/users/{user}/permissions', [UserController::class, 'givePermission'])->name('users.permissions');
     Route::delete('/users/{user}/permissions/{permission}', [UserController::class, 'revokePermission'])->name('users.permissions.revoke');
 
-        //Scanners routing
+    //Scanners routing
     Route::get('/scanner/{id}', [ScannerController::class, 'index'])->name('scanner.index');
     Route::post('/scanner', [ScannerController::class, 'store'])->name('scanner.store');
 
     // Corrected routes for exporting and importing users
     Route::get('/users/export', [UserController::class, 'exportUsers'])->name('users.export');
-    Route::post('/users/import', [UserController::class, 'importUsers'])->name('users.import');
+    Route::post('/users/import', [UserController::class, 'import'])->name('users.import');
+
+    //attendance para sa admin
+    Route::get('/attendance', [AttendanceRecordController::class, 'index'])->name('attendance.index');
+    Route::post('/attendance/{user}/paid', [AttendanceRecordController::class, 'paid'])->name('attendance.paid');
+    Route::resource('attendance', AttendanceRecordController::class)->names('attendance');
+
+    //suggestions
+    Route::get('/suggestions', [SuggestionController::class, 'index'])->name('suggestions.index');
+    Route::get('/suggestions/{suggestion}', [SuggestionController::class, 'show'])->name('suggestions.show');
+    // Route::resource('suggestions', SuggestionController::class)->names('suggestions');
+
 });
 
 //officer and  admin roles
@@ -58,9 +69,9 @@ Route::middleware(['auth', 'verified'])->group(function (){
     Route::get('/events', [EventController::class, 'index'])->name('events.index');
     Route::resource('events', EventController::class)->names('events');
 
-    //suggestions
-    Route::get('/suggestions', [SuggestionController::class, 'index'])->name('suggestions.index');
-    Route::resource('suggestions', SuggestionController::class)->names('suggestions');
+    //store
+    Route::post('/suggestions', [SuggestionController::class, 'store'])->name('suggestions.store');
+    // Route::resource('suggestions', SuggestionController::class)->names('suggestions');
 
     //attendance
     Route::get('/attendance', [AttendanceRecordController::class, 'index'])->name('attendance.index');

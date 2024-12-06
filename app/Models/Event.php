@@ -27,6 +27,6 @@ class Event extends Model
         'name',
         'description',
         'date',
-        'time'
+        'fines'
     ];
 }

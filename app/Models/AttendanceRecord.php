@@ -27,27 +27,28 @@ class AttendanceRecord extends Model
         'morning_time_out',
         'afternoon_time_in',
         'afternoon_time_out',
+        'remarks'
     ];
 
 
-    public function getMorningTimeInAttribute()
-    {
-        return $this->time_in <= '12:00:00' ? $this->time_in : null;
-    }
+    // public function getMorningTimeInAttribute()
+    // {
+    //     return $this->time_in <= '12:00:00' ? $this->time_in : null;
+    // }
 
-    public function getMorningTimeOutAttribute()
-    {
-        return $this->time_out <= '12:00:00' ? $this->time_out : null;
-    }
+    // public function getMorningTimeOutAttribute()
+    // {
+    //     return $this->time_out <= '12:00:00' ? $this->time_out : null;
+    // }
 
-    public function getAfternoonTimeInAttribute()
-    {
-        return $this->time_in > '12:00:00' ? $this->time_in : null;
-    }
+    // public function getAfternoonTimeInAttribute()
+    // {
+    //     return $this->time_in > '12:00:00' ? $this->time_in : null;
+    // }
 
-    public function getAfternoonTimeOutAttribute()
-    {
-        return $this->time_out > '12:00:00' ? $this->time_out : null;
-    }
+    // public function getAfternoonTimeOutAttribute()
+    // {
+    //     return $this->time_out > '12:00:00' ? $this->time_out : null;
+    // }
 
 }

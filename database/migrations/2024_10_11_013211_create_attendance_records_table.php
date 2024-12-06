@@ -20,6 +20,7 @@ return new class extends Migration
             $table->time('morning_time_out')->nullable();
             $table->time('afternoon_time_in')->nullable();
             $table->time('afternoon_time_out')->nullable();
+            $table->varchar('remarks', 15)->nullable();
             $table->timestamps();
         });
     }

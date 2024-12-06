@@ -1,7 +1,8 @@
 <x-admin-layout>
-    <div class="py-2 w-full">
+    <div class="py-2 pb-20 w-full">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div
+                class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-200 dark:border-gray-700">
 
                 {{-- <!-- Back to Users Index -->
                 <div class="flex mb-4">
@@ -100,8 +101,7 @@
                     <div class="flex space-x-2 mt-4 p-2">
                         @if ($user->roles)
                             @foreach ($user->roles as $user_role)
-                                <form class="px-4 py-2 bg-red-500 hover:bg-red-700 text-white rounded-md"
-                                    method="POST"
+                                <form class="px-4 py-2 bg-red-500 hover:bg-red-700 text-white rounded-md" method="POST"
                                     action="{{ route('admin.users.roles.remove', [$user->id, $user_role->id]) }}"
                                     onsubmit="return confirm('Are you sure you want to remove this role?');">
                                     @csrf
@@ -112,23 +112,26 @@
                         @endif
                     </div>
                     <div class="max-w-xl mt-6">
-                        <form method="POST" action="{{ route('admin.users.roles', $user->id) }}">
+                        <form method="POST" action="{{ route('admin.users.roles', $user->id) }}"
+                            onsubmit="return validateForm()">
                             @csrf
-                            <div class="sm:col-span-6">
-                                <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Assign Role</label>
-                                <select id="role" name="role" autocomplete="role-name"
-                                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                    <option value="" disabled selected>Select a role</option>
-                                    @foreach ($roles as $role)
-                                        <option value="{{ $role->name }}">{{ $role->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            @error('role')
-                                <span class="text-red-400 text-sm">{{ $message }}</span>
-                            @enderror
+                            <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Assign Role
+                            </label>
+                            <select id="role" name="role" autocomplete="role-name"
+                                class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option value="" disabled selected>Select a role</option>
+                                @foreach ($roles as $role)
+                                    <option value="{{ $role->name }}">{{ $role->name }}</option>
+                                @endforeach
+                            </select>
+                            <span id="roleError" class="text-red-400 text-sm hidden">Please select a role.</span>
+
                             <div class="sm:col-span-6 pt-5">
-                                <button type="submit" class="px-4 py-2 bg-green-500 hover:bg-green-700 text-white rounded-md">Assign</button>
+                                <button type="submit"
+                                    class="px-4 py-2 bg-green-500 hover:bg-green-700 text-white rounded-md">
+                                    Assign
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -177,3 +180,23 @@
         </div>
     </div>
 </x-admin-layout>
+
+<script>
+    function validateForm() {
+        const roleSelect = document.getElementById('role');
+        const roleError = document.getElementById('roleError');
+
+        // Check if the selected value is empty
+        if (!roleSelect.value) {
+            roleError.classList.remove('hidden'); // Show error message
+            roleSelect.classList.add('border-red-500'); // Add red border
+            roleSelect.focus();
+            return false; // Prevent form submission
+        }
+
+        // If valid, hide the error message
+        roleError.classList.add('hidden');
+        roleSelect.classList.remove('border-red-500');
+        return true; // Allow form submission
+    }
+</script>

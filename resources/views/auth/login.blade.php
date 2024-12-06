@@ -133,10 +133,10 @@
                         <div class="relative">
                             <input id="password" class="block mt-1 w-full border p-2" type="password" name="password"
                                 required autocomplete="current-password">
-                            <button type="button" id="togglePassword" class="fas fa-eye toggle-password"
+                            {{-- <button type="button" id="togglePassword" class="fas fa-eye toggle-password"
                                 style="position: absolute; top: 49%; right: 500px; background: none; border: none; color: black; font-weight: bold; cursor: pointer; margin-top:3px; width: 70px">
                                 Show
-                            </button>
+                            </button> --}}
                         </div>
                     </div>
 
@@ -157,11 +157,11 @@
 
 </html>
 
-<script>
+{{-- <script>
     document.getElementById('togglePassword').addEventListener('click', function() {
         const passwordField = document.getElementById('password');
         const type = passwordField.type === 'password' ? 'text' : 'password';
         passwordField.type = type;
         this.textContent = type === 'password' ? 'Show' : 'Hide';
     });
-</script>
+</script> --}}

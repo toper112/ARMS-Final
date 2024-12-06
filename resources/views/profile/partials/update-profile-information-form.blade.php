@@ -1,42 +1,46 @@
 <section>
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900 dark:text-gray-100">
-                <div class="flex items-center justify-between">
-                    <h1 class="text-xl font-bold">Profile Information</h1>
-                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-                        onclick="openModal()">
-                        Edit
-                    </button>
+    <div class="py-1 pb-20">
+        <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-8">
+            <!-- QR Code Section -->
+            <div class="flex flex-col items-center">
+                <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">Profile Information</h1>
+                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-8">
+                    {!! $qrCode !!}
                 </div>
-                <div class="mt-6 space-y-4">
-                    <div>
-                        <h2 class="text-lg font-semibold">Name:</h2>
-                        <p>{{ $user->first_name }} {{ $user->last_name }}</p>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-semibold">LRN:</h2>
-                        <p>{{ $user->LRN }}</p>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-semibold">Year:</h2>
-                        <p>{{ $user->year }}</p>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-semibold">Section:</h2>
-                        <p>{{ $user->section }}</p>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-semibold">Email:</h2>
-                        <p>{{ $user->email }}</p>
-                    </div>
+            </div>
+
+            <!-- Profile Information Section -->
+            <div class="grid grid-cols-2 gap-6 text-gray-800 dark:text-gray-200">
+                <div>
+                    <h2 class="text-lg font-semibold">Name:</h2>
+                    <p>{{ $user->first_name }} {{ $user->last_name }}</p>
                 </div>
-                <div class="mt-6">
-                    <h2 class="text-lg font-semibold">Your QR Code:</h2>
-                    <div class="mt-4">
-                        {!! $qrCode !!}
-                    </div>
+                <div>
+                    <h2 class="text-lg font-semibold">Section:</h2>
+                    <p>{{ $user->section }}</p>
                 </div>
+
+                <div>
+                    <h2 class="text-lg font-semibold">LRN:</h2>
+                    <p>{{ $user->LRN }}</p>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold">Email:</h2>
+                    <p>{{ $user->email }}</p>
+                </div>
+
+                <div class="col-span-2">
+                    <h2 class="text-lg font-semibold">Year:</h2>
+                    <p>{{ $user->year }}</p>
+                </div>
+            </div>
+
+            <!-- Edit Button -->
+            <div class="mt-8 flex justify-start">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded"
+                    onclick="openModal()">
+                    Edit
+                </button>
             </div>
         </div>
     </div>
@@ -106,6 +110,7 @@
         </div>
     </div>
 </section>
+
 <script>
     function openModal() {
         document.getElementById('editModal').classList.remove('hidden');

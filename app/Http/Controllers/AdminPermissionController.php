@@ -51,13 +51,26 @@ class AdminPermissionController extends Controller
 
     public function assignRole(Request $request, Permission $permission)
     {
-        if ($permission->hasRole($request->role)) {
-            return back()->with('message', 'Role exists.');
+        // Add validation for the 'role' field
+        $validated = $request->validate([
+            'role' => 'required|string|exists:roles,name', // Ensure the role is not empty and exists in the roles table
+        ], [
+            'role.required' => 'Please select a valid role.', // Custom error message for empty selection
+            'role.exists' => 'The selected role does not exist.', // Custom error for invalid roles
+        ]);
+
+        // Check if the user already has the assigned role
+        if ($permission->hasRole($validated['role'])) {
+            return back()->with('message', 'Role already exists for this user.');
         }
 
-        $permission->assignRole($request->role);
-        return back()->with('message', 'Role assigned.');
+        // Assign the role
+        $permission->assignRole($validated['role']);
+
+        // Return success message
+        return back()->with('message', 'Role assigned successfully.');
     }
+
 
     public function removeRole(Permission $permission, Role $role)
     {

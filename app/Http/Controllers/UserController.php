@@ -5,18 +5,59 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UserController extends Controller
 {
-    public function index()  {
+    public function index(Request $request)
+    {
+        // Initialize the query, excluding users where 'first_name' is 'admin'
+        $users = User::query()->whereNot('first_name', 'admin');
 
-        $users = User::whereNot('first_name','admin')->get();
-        // $users = User::all();
-        return view('admin.users.index', compact('users'));
+        // Apply search filter
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $users->where(function($query) use ($search) {
+                $query->where('first_name', 'like', "%$search%")
+                    ->orWhere('last_name', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%");
+            });
+        }
+
+        // Apply year filter
+        if ($request->has('year') && $request->year != '') {
+            $users->where('year', $request->year);
+        }
+
+        // Apply section filter
+        if ($request->filled('section')) {
+            $users->where('section', 'like', "%{$request->section}%");
+        }
+
+        // Exclude specific year and section combination
+        $users = $users->where(function ($query) {
+            $query->where('year', '!=', 1) // Exclude year 1
+                ->orWhere('section', '!=', 'admin'); // Exclude section admin
+        })->paginate(10);
+
+
+        // Get the filtered results
+        // $users = $users->paginate(10);
+
+        // Define possible years (assuming 1 to 4 are the valid years)
+        $years = User::distinct()->pluck('year')->toArray();
+
+        // Retrieve distinct sections from the users table
+        $sections = User::distinct()->pluck('section')->toArray();
+
+        // Return the view with filtered users, years, and sections data
+        return view('admin.users.index', compact('users', 'years', 'sections'));
     }
+
+
 
     public function show(User $user)
     {
@@ -152,31 +193,88 @@ class UserController extends Controller
      }
 
      // Method for importing users from CSV
-     public function importUsers(Request $request)
-     {
-         $request->validate([
-             'csv_file' => 'required|mimes:csv,txt',
-         ]);
+     public function import(Request $request)
+{
+    // Validate the uploaded file
+    $request->validate([
+        'csv_file' => 'required|mimes:csv,txt', // Accept only CSV or TXT files
+    ]);
 
-         $file = $request->file('csv_file');
-         $handle = fopen($file->getPathname(), 'r');
-         $header = fgetcsv($handle); // Skip the header row
+    // Retrieve the uploaded file
+    $file = $request->file('csv_file');
 
-         while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
-             User::create([
-                 'first_name' => $data[0],
-                 'last_name' => $data[1],
-                 'LRN' => $data[2],
-                 'year' => $data[3],
-                 'section' => $data[4],
-                 'email' => $data[5],
-                 'password' => bcrypt('defaultPassword'), // Set a default password or handle accordingly
-             ]);
-         }
+    // Open the file for reading
+    $handle = fopen($file->getPathname(), 'r');
 
-         fclose($handle);
+    // Skip the header row
+    $header = fgetcsv($handle);
 
-         return redirect()->route('admin.users.index')->with('success', 'Users imported successfully!');
-     }
+    // Initialize counters and error storage
+    $importedCount = 0;
+    $errors = [];
+
+    // Read and process each row
+    while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+        try {
+            // Validate row data before creating a user
+            $validatedData = [
+                'first_name' => $data[0],
+                'last_name' => $data[1],
+                'LRN' => $data[2],
+                'year' => $data[3],
+                'section' => $data[4],
+                'email' => $data[5],
+            ];
+
+            // Perform field-level validation
+            $validator = Validator::make($validatedData, [
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'LRN' => 'required|numeric|unique:users,LRN',
+                'year' => 'required|integer',
+                'section' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+            ]);
+
+
+            if ($validator->fails()) {
+                // Capture validation errors for the current row
+                $errors[] = "Row with LRN {$data[2]}: " . implode(', ', $validator->errors()->all());
+                continue;
+            }
+
+            // Create the user
+            User::create([
+                'first_name' => $data[0],
+                'last_name' => $data[1],
+                'LRN' => $data[2],
+                'year' => $data[3],
+                'section' => $data[4],
+                'email' => $data[5],
+                'password' => bcrypt(value: 'salus2024'), // Set default password
+            ]);
+
+            $importedCount++; // Increment the counter on successful creation
+        } catch (\Exception $e) {
+            // Capture any other errors during user creation
+            $errors[] = "Row with LRN {$data[2]}: " . $e->getMessage();
+        }
+    }
+
+    // Close the file after processing
+    fclose($handle);
+
+    // Prepare feedback messages
+    $message = "{$importedCount} users imported successfully.";
+    if (!empty($errors)) {
+        $message .= " However, there were errors with some rows.";
+    }
+
+    // Redirect back with success and error messages
+    return redirect()->route('admin.users.index')
+        ->with('message', $message)
+        ->with('errors', $errors);
+}
+
 
 }
